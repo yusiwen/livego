@@ -23,11 +23,6 @@ const (
 	SAVE_STATICS_INTERVAL = 5000
 )
 
-var (
-	readTimeout  = configure.Config.GetInt("read_timeout")
-	writeTimeout = configure.Config.GetInt("write_timeout")
-)
-
 type Client struct {
 	handler av.Handler
 	getter  av.GetWriter
@@ -203,7 +198,7 @@ func NewVirWriter(conn StreamReadWriteCloser) *VirWriter {
 	ret := &VirWriter{
 		Uid:         uid.NewId(),
 		conn:        conn,
-		RWBaser:     av.NewRWBaser(time.Second * time.Duration(writeTimeout)),
+		RWBaser:     av.NewRWBaser(time.Second * time.Duration(configure.Config.GetInt("write_timeout"))),
 		packetQueue: make(chan *av.Packet, maxQueueNum),
 		WriteBWInfo: StaticsBW{0, 0, 0, 0, 0, 0, 0, 0},
 	}
@@ -377,7 +372,7 @@ func NewVirReader(conn StreamReadWriteCloser) *VirReader {
 	return &VirReader{
 		Uid:        uid.NewId(),
 		conn:       conn,
-		RWBaser:    av.NewRWBaser(time.Second * time.Duration(writeTimeout)),
+		RWBaser:    av.NewRWBaser(time.Second * time.Duration(configure.Config.GetInt("write_timeout"))),
 		demuxer:    flv.NewDemuxer(),
 		ReadBWInfo: StaticsBW{0, 0, 0, 0, 0, 0, 0, 0},
 	}
